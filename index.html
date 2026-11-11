@@ -134,13 +134,19 @@ footer{padding:30px 0 48px;color:var(--soft);font-size:13px;text-align:center}fo
 <script>
 // ====== EDITA SOLO ESTO ======
 var REPO="AuroraNegocio/Narrador";   // usuario/repositorio en GitHub
-var APK_VERSION="v2.5.0";
-var APK_FILE="Narrador.apk";          // nombre exacto del APK en Releases
 // =============================
 var base="https://github.com/"+REPO;
 var d=document.getElementById("dl");
-d.href=base+"/releases/latest/download/"+APK_FILE;
-d.textContent="⬇ Descargar APK "+APK_VERSION;
 document.getElementById("gh").href=base;
+d.href=base+"/releases/latest";            // respaldo si algo falla
+fetch("https://api.github.com/repos/"+REPO+"/releases/latest")
+ .then(function(r){if(!r.ok)throw 0;return r.json()})
+ .then(function(rel){
+   var a=(rel.assets||[]).filter(function(x){return /\.apk$/i.test(x.name)})[0];
+   if(!a)return;
+   d.href=a.browser_download_url;           // descarga directa del APK más reciente
+   d.setAttribute("download",a.name);
+   d.textContent="\u2B07 Descargar APK "+(rel.tag_name||"");
+ }).catch(function(){});
 </script>
 </body></html>
